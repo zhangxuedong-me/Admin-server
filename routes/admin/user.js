@@ -110,69 +110,107 @@ router.get('/user_auth', ctx => {
 // 获取用户头像
 router.get('/user_img', ctx => {
 
-    const headImg = [
-        {
-            id: 1,
-            imgSrc: 'http://localhost:3000/images/nv_01.jpg'
-        },
-        {
-            id: 2,
-            imgSrc: 'http://localhost:3000/images/nv_02.jpg'
-        },
-        {
-            id: 3,
-            imgSrc: 'http://localhost:3000/images/nan_01.jpg'
-        },
-        {
-            id: 4,
-            imgSrc: 'http://localhost:3000/images/nv_03.jpg'
-        },
-        {
-            id: 5,
-            imgSrc: 'http://localhost:3000/images/nan_02.jpg'
-        },
-        {
-            id: 6,
-            imgSrc: 'http://localhost:3000/images/nan_03.jpg'
-        },
-        {
-            id: 7,
-            imgSrc: 'http://localhost:3000/images/nv_04.jpg'
-        },
-        {
-            id: 8,
-            imgSrc: 'http://localhost:3000/images/nv_05.jpg'
-        },
-        {
-            id: 9,
-            imgSrc: 'http://localhost:3000/images/nv_06.jpg'
-        },
-        {
-            id: 10,
-            imgSrc: 'http://localhost:3000/images/nv_07.jpg'
-        },
-        {
-            id: 11,
-            imgSrc: 'http://localhost:3000/images/nv_08.jpg'
-        },
-        {
-            id: 12,
-            imgSrc: 'http://localhost:3000/images/nan_05.jpg'
-        },
-        {
-            id: 13,
-            imgSrc: 'http://localhost:3000/images/nan_06.jpg'
-        },
-        {
-            id: 14,
-            imgSrc: 'http://localhost:3000/images/guanliyuan.png'
-        }
-    ] 
+    const imgArr = {
 
-    const { currentPage, pageSize } = ctx.query
+        admin: [
+            {
+                id: 1,
+                imgSrc: 'http://localhost:3000/images/guanliyuan.png',
+            },
+            {
+                id: 2,
+                imgSrc: 'http://localhost:3000/images/nv_05.jpg',
+            },
+            {
+                id: 3,
+                imgSrc: 'http://localhost:3000/images/nan_07.jpg',
+            },
+            {
+                id: 4,
+                imgSrc: 'http://localhost:3000/images/nan_08.jpg',
+            },
+            {
+                id: 5,
+                imgSrc: 'http://localhost:3000/images/nan_09.jpg',
+            },
+            {
+                id: 6,
+                imgSrc: 'http://localhost:3000/images/nan_10.jpg',
+            }
+        ],
+        user: [
+            {
+                id: 1,
+                imgSrc: 'http://localhost:3000/images/nv_01.jpg',
+                type: 'user'
+            },
+            {
+                id: 2,
+                imgSrc: 'http://localhost:3000/images/nv_02.jpg',
+                type: 'user'
+            },
+            {
+                id: 3,
+                imgSrc: 'http://localhost:3000/images/nan_01.jpg',
+                type: 'user'
+            },
+            {
+                id: 4,
+                imgSrc: 'http://localhost:3000/images/nv_03.jpg',
+                type: 'user'
+            },
+            {
+                id: 5,
+                imgSrc: 'http://localhost:3000/images/nan_02.jpg',
+                type: 'user'
+            },
+            {
+                id: 6,
+                imgSrc: 'http://localhost:3000/images/nan_03.jpg',
+                type: 'user'
+            },
+            {
+                id: 7,
+                imgSrc: 'http://localhost:3000/images/nv_04.jpg',
+                type: 'user'
+            },
+            {
+                id: 8,
+                imgSrc: 'http://localhost:3000/images/nv_06.jpg',
+                type: 'user'
+            },
+            {
+                id: 9,
+                imgSrc: 'http://localhost:3000/images/nv_07.jpg',
+                type: 'user'
+            },
+            {
+                id: 10,
+                imgSrc: 'http://localhost:3000/images/nv_08.jpg',
+                type: 'user'
+            },
+            {
+                id: 11,
+                imgSrc: 'http://localhost:3000/images/nan_05.jpg',
+                type: 'user'
+            },
+            {
+                id: 12,
+                imgSrc: 'http://localhost:3000/images/nan_06.jpg',
+                type: 'user'
+            }
+        ]
+    }
+
+    const { currentPage, pageSize, type } = ctx.query
+
+    
+
+    let total = Math.ceil(imgArr[type].length / pageSize)
 
     // 总页数
-    let total = Math.ceil(headImg.length / pageSize)
+
+    let index = 0
     
     let pageArrData = []
 
@@ -183,14 +221,17 @@ router.get('/user_img', ctx => {
 
         let i = currentPage * pageSize - pageSize
 
-        for (i; i < headImg.length;i++) {
+        for (i; i < imgArr[type].length;i++) {
 
             if (i < currentPage * pageSize) {
 
-                pageArrData.push(headImg[i])
+                pageArrData.push(imgArr[type][i])
             }
         }
-        ctx.body = { code: 200, total: headImg.length, message: '获取成功', data: pageArrData }
+
+        console.log(type)
+
+        ctx.body = { code: 200, total: imgArr[type].length, message: '获取成功', data: pageArrData }
     }
     
 })
@@ -223,4 +264,29 @@ router.get('/login_img', ctx => {
     }
     
 })
+
+// 修改用户资料
+router.post('/edit_user', ctx => {
+
+    const { id } = ctx.request.body
+
+    const filePath = path.join(__dirname, '../../admin_data/user_register.json')
+
+    const fileItem = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+
+    fileItem.forEach((item, index) => {
+
+        if (item.id == id) {
+
+            fileItem[index] = ctx.request.body
+            
+            fs.writeFileSync(filePath, JSON.stringify(fileItem), 'utf8')
+
+            ctx.body = { code: 200, message: '修改成功', data: fileItem[index] }
+
+            return
+        }
+    })
+})
+
 module.exports = router
