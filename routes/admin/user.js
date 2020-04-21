@@ -58,7 +58,8 @@ router.get('/register', ctx => {
         id: fileItem.length + 1,
         code: 200,
         gender,
-        headImg
+        headImg,
+        introduce: gender === "男" ? '阳光帅气的大帅哥你好' : '可爱漂亮善良的大美女你好'
     }
 
     const auth = {
