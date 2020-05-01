@@ -30,7 +30,6 @@ router.post('/article_classification', async ctx => {
         isProhibit: true
     }
 
-    console.log(ctx.request.body)
 
     if (!fileItem) {
 
@@ -40,6 +39,7 @@ router.post('/article_classification', async ctx => {
         fileItem = JSON.parse(fileItem)
         
         const classificationItem = fileItem.find(item => {
+            
             console.log(item.id)
             return item.name === classificationData.name && item.id === id
         })
@@ -54,7 +54,7 @@ router.post('/article_classification', async ctx => {
         fs.writeFileSync(filePath, JSON.stringify(fileItem, 'utf8'))
     }
 
-    ctx.body = { code: 200, message: '恭喜您，创建成功，快去使用吧!' }
+    ctx.body = { code: 200, message: '恭喜您，创建成功，快去使用吧!', data: [classificationData]}
 })
 
 // 获取分类数据接口
@@ -231,7 +231,6 @@ router.get('/get_articles', async ctx => {
         // 不参与验证的属性项
         let exclude = ['id', 'status', 'publish_time[]', 'count', 'page']
 
-
         fileItem.forEach(item => {
 
             // 当前筛选文章的时间
@@ -239,10 +238,14 @@ router.get('/get_articles', async ctx => {
 
             // 判断一下只有用户id和文章id匹配就，才去筛选，否则就是空没有数据
             if (item.id != id) return
-            
+
+            total = 0
+
+            selectIndex = 0
+
             // 遍历请求验证的搜索项
             for (let key in ctx.query) {
-
+                
                 // 需要跳过验证的搜索项
                 if (exclude.includes(key)) continue
 
@@ -255,14 +258,14 @@ router.get('/get_articles', async ctx => {
                     //验证跳过的搜说项
                     selectIndex++
                 }
-
-                    // 需要验证的总数量搜索项 
-                    total++
+                
+                // 需要验证的总数量搜索项 
+                total++
             }
 
             // 判断验证搜索项都为空的话，应该返回所有的数据
             if (total) {
-                
+
                 if (status != 0) {
 
                     if (status != item.status) return
@@ -275,7 +278,7 @@ router.get('/get_articles', async ctx => {
                     cheackTime(dateEnd, dateStart, articleTime, articleArr, item)
                     
                 } else {
-                    
+
                     // 不相等的话，就需要对文章分类和文章关键字做一个单独的判断
                     if (selectVal !== item.selectVal) return 
 
@@ -305,9 +308,9 @@ router.get('/get_articles', async ctx => {
         let selectArr = []
         
         let totalPage = Math.ceil(articleArr.length / count)
-
+ 
         if (page > totalPage) {
-
+            
             ctx.body = { code: 200, message: "暂无文章信息" }
             return
         }

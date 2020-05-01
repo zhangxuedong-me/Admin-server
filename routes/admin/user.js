@@ -48,12 +48,12 @@ router.get('/register', ctx => {
 
     let authItem = JSON.parse(fs.readFileSync(authPath, 'utf8'))
 
-    const { username, password, mailbox, gender, headImg } = ctx.query
+    const { username, password, Email, gender, headImg } = ctx.query
 
 
     const obj = {
         username,
-        Email: mailbox,
+        Email: Email,
         password: password,
         id: fileItem.length + 1,
         code: 200,
@@ -70,7 +70,7 @@ router.get('/register', ctx => {
 
     const trem = fileItem.find(item => {
 
-        return item.username === username || item.password === password || item.Email === mailbox
+        return item.username === username || item.password === password || item.Email === Email
            
     })
     if(!trem) {
